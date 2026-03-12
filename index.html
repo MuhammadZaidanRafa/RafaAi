@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,66 +11,44 @@
 
 *{
 box-sizing:border-box;
+margin:0;
+padding:0;
 }
 
 body{
-margin:0;
-font-family:Arial, sans-serif;
+font-family:system-ui, Arial;
 background:#0f172a;
 color:white;
 display:flex;
+flex-direction:column;
 height:100vh;
-overflow:hidden;
-}
-
-/* SIDEBAR */
-
-#sidebar{
-width:230px;
-background:#020617;
-border-right:1px solid #1e293b;
-display:flex;
-flex-direction:column;
-}
-
-#logo{
-padding:20px;
-font-size:20px;
-font-weight:bold;
-text-align:center;
-border-bottom:1px solid #1e293b;
-}
-
-#newchat{
-margin:15px;
-padding:10px;
-border:none;
-border-radius:8px;
-background:#2563eb;
-color:white;
-cursor:pointer;
-}
-
-#newchat:hover{
-background:#1d4ed8;
-}
-
-/* MAIN */
-
-#main{
-flex:1;
-display:flex;
-flex-direction:column;
 }
 
 /* HEADER */
 
 header{
-padding:15px;
-text-align:center;
-font-weight:bold;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:14px 18px;
 background:#020617;
 border-bottom:1px solid #1e293b;
+font-weight:600;
+}
+
+/* REFRESH BUTTON */
+
+#refresh{
+background:#2563eb;
+border:none;
+padding:8px 14px;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+
+#refresh:hover{
+background:#1d4ed8;
 }
 
 /* CHAT AREA */
@@ -77,10 +56,10 @@ border-bottom:1px solid #1e293b;
 #chat{
 flex:1;
 overflow-y:auto;
-padding:25px;
+padding:20px;
 display:flex;
 flex-direction:column;
-gap:18px;
+gap:16px;
 scroll-behavior:smooth;
 }
 
@@ -90,46 +69,52 @@ scroll-behavior:smooth;
 align-self:flex-end;
 background:#2563eb;
 padding:12px 16px;
-border-radius:15px 15px 3px 15px;
-max-width:65%;
+border-radius:16px 16px 4px 16px;
+max-width:75%;
+word-wrap:break-word;
 }
 
 .ai{
 align-self:flex-start;
 background:#1e293b;
 padding:12px 16px;
-border-radius:15px 15px 15px 3px;
-max-width:65%;
+border-radius:16px 16px 16px 4px;
+max-width:75%;
+word-wrap:break-word;
 }
 
-/* INPUT */
+/* INPUT AREA */
 
 #inputArea{
 display:flex;
-padding:15px;
+padding:14px;
+gap:10px;
 background:#020617;
 border-top:1px solid #1e293b;
 }
+
+/* INPUT */
 
 #question{
 flex:1;
 padding:12px;
 border:none;
 border-radius:10px;
-font-size:16px;
-outline:none;
 background:#1e293b;
 color:white;
+font-size:15px;
+outline:none;
 }
 
+/* BUTTON */
+
 button{
-margin-left:10px;
-padding:12px 20px;
+padding:12px 18px;
 border:none;
 border-radius:10px;
 background:#2563eb;
 color:white;
-font-size:16px;
+font-size:15px;
 cursor:pointer;
 }
 
@@ -137,7 +122,7 @@ button:hover{
 background:#1d4ed8;
 }
 
-/* LOADING */
+/* TYPING */
 
 .typing{
 display:flex;
@@ -149,16 +134,11 @@ width:6px;
 height:6px;
 background:white;
 border-radius:50%;
-animation:blink 1s infinite;
+animation:blink 1.2s infinite;
 }
 
-.dot:nth-child(2){
-animation-delay:.2s;
-}
-
-.dot:nth-child(3){
-animation-delay:.4s;
-}
+.dot:nth-child(2){animation-delay:.2s;}
+.dot:nth-child(3){animation-delay:.4s;}
 
 @keyframes blink{
 0%{opacity:0}
@@ -166,29 +146,53 @@ animation-delay:.4s;
 100%{opacity:0}
 }
 
+/* RESPONSIVE */
+
+@media (max-width:600px){
+
+header{
+font-size:14px;
+}
+
+#question{
+font-size:14px;
+}
+
+button{
+padding:10px 14px;
+}
+
+.user,.ai{
+max-width:85%;
+}
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div id="sidebar">
+<header>
 
-<div id="logo">Rafa AI</div>
+<div>Rafa AI</div>
 
-<button id="newchat" onclick="newChat()">+ Chat Baru</button>
+<button id="refresh" onclick="refreshChat()">Refresh</button>
 
-</div>
-
-<div id="main">
-
-<header>Rafa AI Assistant</header>
+</header>
 
 <div id="chat"></div>
 
 <div id="inputArea">
-<input id="question" placeholder="Tanya apa saja..." onkeydown="enter(event)">
+
+<input
+id="question"
+placeholder="Tanya apa saja..."
+onkeydown="enter(event)"
+>
+
 <button onclick="kirim()">Kirim</button>
-</div>
 
 </div>
 
@@ -202,7 +206,7 @@ kirim();
 }
 }
 
-function newChat(){
+function refreshChat(){
 document.getElementById("chat").innerHTML="";
 }
 
