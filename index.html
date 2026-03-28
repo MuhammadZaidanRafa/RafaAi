@@ -1,251 +1,464 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Rafa AI</title>
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
+  :root {
+    --bg: #0b1120;
+    --surface: #141c2e;
+    --surface2: #1a2540;
+    --border: rgba(255,255,255,0.07);
+    --accent: #3b7ef4;
+    --accent-dim: #1f4ea0;
+    --text: #e8edf7;
+    --text-muted: #7a8aaa;
+    --user-bg: #1e3a6e;
+    --user-border: #2e54a8;
+    --ai-bg: #1a2540;
+    --ai-border: rgba(255,255,255,0.08);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
 
-body{
-font-family:system-ui, Arial;
-background:#0f172a;
-color:white;
-display:flex;
-flex-direction:column;
-height:100vh;
-}
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
 
-/* HEADER */
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
 
-header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:14px 18px;
-background:#020617;
-border-bottom:1px solid #1e293b;
-font-weight:600;
-}
+  /* ── HEADER ── */
+  header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
 
-/* REFRESH BUTTON */
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-#refresh{
-background:#2563eb;
-border:none;
-padding:8px 14px;
-border-radius:8px;
-color:white;
-cursor:pointer;
-}
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b7ef4, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
 
-#refresh:hover{
-background:#1d4ed8;
-}
+  .header-info h1 {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+  }
 
-/* CHAT AREA */
+  .status {
+    font-size: 11px;
+    color: #4ade80;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
 
-#chat{
-flex:1;
-overflow-y:auto;
-padding:20px;
-display:flex;
-flex-direction:column;
-gap:16px;
-scroll-behavior:smooth;
-}
+  .status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    display: inline-block;
+  }
 
-/* BUBBLE */
+  .btn-clear {
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
 
-.user{
-align-self:flex-end;
-background:#2563eb;
-padding:12px 16px;
-border-radius:16px 16px 4px 16px;
-max-width:75%;
-word-wrap:break-word;
-}
+  .btn-clear:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.15);
+  }
 
-.ai{
-align-self:flex-start;
-background:#1e293b;
-padding:12px 16px;
-border-radius:16px 16px 16px 4px;
-max-width:75%;
-word-wrap:break-word;
-}
+  /* ── CHAT AREA ── */
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
 
-/* INPUT AREA */
+  #chat::-webkit-scrollbar {
+    width: 4px;
+  }
+  #chat::-webkit-scrollbar-track { background: transparent; }
+  #chat::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+  }
 
-#inputArea{
-display:flex;
-padding:14px;
-gap:10px;
-background:#020617;
-border-top:1px solid #1e293b;
-}
+  /* Empty state */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
 
-/* INPUT */
+  .empty-state .big-icon {
+    font-size: 40px;
+    opacity: 0.4;
+  }
 
-#question{
-flex:1;
-padding:12px;
-border:none;
-border-radius:10px;
-background:#1e293b;
-color:white;
-font-size:15px;
-outline:none;
-}
+  .empty-state p {
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 240px;
+  }
 
-/* BUTTON */
+  /* Bubbles */
+  .bubble-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-button{
-padding:12px 18px;
-border:none;
-border-radius:10px;
-background:#2563eb;
-color:white;
-font-size:15px;
-cursor:pointer;
-}
+  .bubble-wrap.user-wrap {
+    align-items: flex-end;
+  }
 
-button:hover{
-background:#1d4ed8;
-}
+  .bubble-wrap.ai-wrap {
+    align-items: flex-start;
+  }
 
-/* TYPING */
+  .bubble {
+    padding: 10px 14px;
+    border-radius: var(--radius-lg);
+    max-width: min(75%, 520px);
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
 
-.typing{
-display:flex;
-gap:5px;
-}
+  .bubble.user {
+    background: var(--user-bg);
+    border: 1px solid var(--user-border);
+    border-bottom-right-radius: 4px;
+    color: var(--text);
+  }
 
-.dot{
-width:6px;
-height:6px;
-background:white;
-border-radius:50%;
-animation:blink 1.2s infinite;
-}
+  .bubble.ai {
+    background: var(--ai-bg);
+    border: 1px solid var(--ai-border);
+    border-bottom-left-radius: 4px;
+    color: var(--text);
+  }
 
-.dot:nth-child(2){animation-delay:.2s;}
-.dot:nth-child(3){animation-delay:.4s;}
+  .bubble-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 0 4px;
+  }
 
-@keyframes blink{
-0%{opacity:0}
-50%{opacity:1}
-100%{opacity:0}
-}
+  /* Typing indicator */
+  .typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 0;
+  }
 
-/* RESPONSIVE */
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: blink 1.2s infinite ease-in-out;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
 
-@media (max-width:600px){
+  @keyframes blink {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50%       { opacity: 1;   transform: scale(1);   }
+  }
 
-header{
-font-size:14px;
-}
+  /* ── INPUT AREA ── */
+  #inputArea {
+    flex-shrink: 0;
+    padding: 10px 12px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
 
-#question{
-font-size:14px;
-}
+  .input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 6px 6px 6px 14px;
+    transition: border-color 0.15s;
+  }
 
-button{
-padding:10px 14px;
-}
+  .input-row:focus-within {
+    border-color: rgba(59,126,244,0.5);
+  }
 
-.user,.ai{
-max-width:85%;
-}
+  #question {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none;
+    max-height: 120px;
+    min-height: 24px;
+    padding: 4px 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
-}
+  #question::placeholder {
+    color: var(--text-muted);
+  }
 
+  #question:disabled {
+    opacity: 0.5;
+  }
+
+  #sendBtn {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    font-family: var(--font);
+  }
+
+  #sendBtn:hover:not(:disabled) {
+    background: #5a94f8;
+  }
+
+  #sendBtn:active:not(:disabled) {
+    transform: scale(0.93);
+  }
+
+  #sendBtn:disabled {
+    background: var(--surface2);
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (min-width: 600px) {
+    header { padding: 14px 24px; }
+    #chat   { padding: 20px; gap: 14px; }
+    #inputArea { padding: 12px 24px; padding-bottom: 16px; }
+    .bubble { font-size: 15px; }
+  }
+
+  @media (min-width: 900px) {
+    body { max-width: 740px; margin: 0 auto; }
+  }
 </style>
-
 </head>
-
 <body>
 
 <header>
-
-<div>Rafa AI</div>
-
-<button id="refresh" onclick="refreshChat()">Refresh</button>
-
+  <div class="header-left">
+    <div class="avatar">🤖</div>
+    <div class="header-info">
+      <h1>Rafa AI</h1>
+      <span class="status">Online</span>
+    </div>
+  </div>
+  <button class="btn-clear" onclick="clearChat()">Hapus chat</button>
 </header>
 
-<div id="chat"></div>
+<div id="chat">
+  <div class="empty-state" id="emptyState">
+    <div class="big-icon">💬</div>
+    <p>Tanya apa saja, saya siap membantu kamu!</p>
+  </div>
+</div>
 
 <div id="inputArea">
-
-<input
-id="question"
-placeholder="Tanya apa saja..."
-onkeydown="enter(event)"
->
-
-<button onclick="kirim()">Kirim</button>
-
+  <div class="input-row">
+    <textarea
+      id="question"
+      placeholder="Ketik pertanyaan..."
+      rows="1"
+      autocomplete="off"
+      autocorrect="off"
+      spellcheck="false"
+    ></textarea>
+    <button id="sendBtn" onclick="kirim()" title="Kirim">
+      ↑
+    </button>
+  </div>
 </div>
 
 <script src="script.js"></script>
-
 <script>
+  const questionEl = document.getElementById("question");
+  const chatEl     = document.getElementById("chat");
+  const sendBtn    = document.getElementById("sendBtn");
+  const emptyState = document.getElementById("emptyState");
 
-function enter(e){
-if(e.key==="Enter"){
-kirim();
-}
-}
+  // Auto-resize textarea
+  questionEl.addEventListener("input", () => {
+    questionEl.style.height = "auto";
+    questionEl.style.height = Math.min(questionEl.scrollHeight, 120) + "px";
+  });
 
-function refreshChat(){
-document.getElementById("chat").innerHTML="";
-}
+  // Enter kirim, Shift+Enter baris baru
+  questionEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      kirim();
+    }
+  });
 
-async function kirim(){
+  function getTime() {
+    return new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  }
 
-let input = document.getElementById("question");
-let chat = document.getElementById("chat");
+  function sembunyikanEmpty() {
+    if (emptyState) emptyState.style.display = "none";
+  }
 
-let teks = input.value;
+  async function kirim() {
+    const teks = questionEl.value.trim();
+    if (!teks || questionEl.disabled) return;
 
-if(teks.trim()==="") return;
+    sembunyikanEmpty();
 
-chat.innerHTML += `<div class="user">${teks}</div>`;
+    // Disable input
+    questionEl.disabled = true;
+    sendBtn.disabled    = true;
 
-input.value="";
+    // Reset textarea height
+    questionEl.value        = "";
+    questionEl.style.height = "auto";
 
-let aiBubble = document.createElement("div");
-aiBubble.className="ai";
+    // Bubble user
+    const userWrap = document.createElement("div");
+    userWrap.className = "bubble-wrap user-wrap";
+    userWrap.innerHTML = `
+      <div class="bubble user">${escapeHTML(teks)}</div>
+      <span class="bubble-meta">${getTime()}</span>
+    `;
+    chatEl.appendChild(userWrap);
+    chatEl.scrollTop = chatEl.scrollHeight;
 
-aiBubble.innerHTML = `
-<div class="typing">
-<div class="dot"></div>
-<div class="dot"></div>
-<div class="dot"></div>
-</div>
-`;
+    // Bubble AI (typing)
+    const aiWrap = document.createElement("div");
+    aiWrap.className = "bubble-wrap ai-wrap";
+    const aiBubble = document.createElement("div");
+    aiBubble.className = "bubble ai";
+    aiBubble.innerHTML = `<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+    aiWrap.appendChild(aiBubble);
+    chatEl.appendChild(aiWrap);
+    chatEl.scrollTop = chatEl.scrollHeight;
 
-chat.appendChild(aiBubble);
+    try {
+      const jawaban = await tanyaAI(teks);
+      await ketikText(aiBubble, jawaban);
 
-chat.scrollTop = chat.scrollHeight;
+      // Tambah timestamp setelah jawaban
+      const meta = document.createElement("span");
+      meta.className = "bubble-meta";
+      meta.textContent = getTime();
+      aiWrap.appendChild(meta);
+    } catch (err) {
+      aiBubble.textContent = "Maaf, terjadi kesalahan. Coba lagi.";
+      console.error("Error kirim:", err);
+    }
 
-let jawaban = await tanyaAI(teks);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    saveChat();
 
-aiBubble.innerText = jawaban;
+    questionEl.disabled = false;
+    sendBtn.disabled    = false;
+    questionEl.focus();
+  }
 
-chat.scrollTop = chat.scrollHeight;
+  // Override clearChat agar empty state muncul lagi
+  const _clearChat = clearChat;
+  window.clearChat = function () {
+    _clearChat();
+    if (emptyState) emptyState.style.display = "";
+  };
 
-}
-
+  // Muat chat lama — sembunyikan empty state jika ada isi
+  window.addEventListener("load", () => {
+    if (chatEl.children.length > 1) sembunyikanEmpty();
+  });
 </script>
 
 </body>
